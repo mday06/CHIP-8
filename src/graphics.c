@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
+#include "types.h"
 #include "chip8.h"
 #include "graphics.h"
 
@@ -41,8 +43,6 @@ void initGfx(Display *display) {
 }
 
 void Draw(chip8 *chip, Display *display) {
-    u32 frameStart = SDL_GetTicks();
-
     // Set background color
     SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
     SDL_RenderClear(display->renderer);
@@ -70,11 +70,15 @@ void Draw(chip8 *chip, Display *display) {
             return;
     }
 
-    u32 frameTime = SDL_GetTicks() - frameStart;
-    
-    if(frameTime < FRAME_RATE)
-        SDL_Delay(FRAME_RATE - frameTime);
     SDL_RenderPresent(display->renderer);
+}
+
+b8 checkForExit() {
+    SDL_Event event;
+    if(SDL_PollEvent(&event))
+        if(event.type == SDL_QUIT)
+            return 1;
+    return 0;
 }
 
 void exitGfx(Display *display) {

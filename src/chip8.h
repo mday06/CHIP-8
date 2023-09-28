@@ -1,9 +1,6 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
-typedef unsigned char b8;
-typedef unsigned short u16;
-
 typedef struct {
     b8 memory[4096];
     u16 stack[16];
@@ -27,6 +24,10 @@ static const u16 FRAMEBUFFER_SIZE = 64 * 32;
 // Rom related
 static const u16 MAX_ROM_SIZE = 4096;
 static const u16 ROM_LOAD_ADDRESS = 0x200;
+
+// Frequency related
+static const u16 INSTRUCTIONS_PER_SECOND = 600;
+static const float TIME_PER_FRAME = 1000.0f/(float)INSTRUCTIONS_PER_SECOND;
 
 // Font related
 static const b8 FONT_SIZE = 80;
