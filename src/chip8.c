@@ -60,6 +60,8 @@ u16 fetchInstruction(chip8 *chip) {
 }
 
 b8 executeInstruction(chip8 *chip, u16 opcode) {
+    // Note: Make the function return 2 if it's waiting
+    // for input
     // This function also returns 1 if the framebuffer
     // changed or 0 if it didn't change
     b8 drawFlag = 0;
@@ -73,8 +75,8 @@ b8 executeInstruction(chip8 *chip, u16 opcode) {
                     break;
                 // Pop address from the stack
                 case 0xEE:
-                    chip->PC = chip->stack[chip->SP];
                     chip->SP--;
+                    chip->PC = chip->stack[chip->SP];
                     break;
             }
             break;
@@ -158,7 +160,7 @@ b8 executeInstruction(chip8 *chip, u16 opcode) {
                     chip->V[0xF] = 0;
                     if(chip->V[(opcode & yMask) >> 4] > chip->V[(opcode & xMask) >> 8])
                         chip->V[0xF] = 1;
-                    chip->V[(opcode & xMask) >> 8] = chip->V[(opcode & yMask) >> 4] - chip->V[(opcode & xMask) >> 9];
+                    chip->V[(opcode & xMask) >> 8] = chip->V[(opcode & yMask) >> 4] - chip->V[(opcode & xMask) >> 8];
                     break;
                 // Same as 0x6, but shift the Vx register to the left
                 case 0xE: {
@@ -239,11 +241,19 @@ b8 executeInstruction(chip8 *chip, u16 opcode) {
                     chip->I += chip->V[(opcode & xMask) >> 8];
                     break;
                 // Get key
-                case 0x0A:
-                    // chip->V[(opcode & xMask) >> 8] = getKey();
-                    // if(getKey() == 0x10)
-                    //     chip->PC -= 2;
+                case 0x0A: {
+                    b8 keyPressed = 0x10;
+                    for(int key = 0; key < 16; ++key)
+                        if(chip->keyboard[key]) {
+                            keyPressed = key;
+                            break;
+                        }
+                    if(keyPressed == 0x10)
+                        chip->PC -= 2;
+                    else
+                        chip->V[(opcode & xMask) >> 8] = keyPressed;
                     break;
+                }
                 // Load font character from memory
                 case 0x29:
                     chip->I = FONT_START_ADDRESS + (chip->V[(opcode & xMask) >> 8] * 5);
@@ -260,7 +270,7 @@ b8 executeInstruction(chip8 *chip, u16 opcode) {
                 case 0x55: {
                     b8 x = (opcode & xMask) >> 8;
                     for(b8 i = 0; i <= x; ++i) {
-                        chip->memory[chip->I + i] = chip->V[x];
+                        chip->memory[chip->I + i] = chip->V[i];
                     }
                     break;
                 }

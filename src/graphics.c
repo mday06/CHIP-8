@@ -73,13 +73,13 @@ void Draw(chip8 *chip, Display *display) {
     SDL_RenderPresent(display->renderer);
 }
 
-b8 checkForExit() {
+/* b8 checkForExit() {
     SDL_Event event;
     if(SDL_PollEvent(&event))
         if(event.type == SDL_QUIT)
             return 1;
     return 0;
-}
+} */
 
 void exitGfx(Display *display) {
     SDL_DestroyRenderer(display->renderer);

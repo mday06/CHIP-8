@@ -12,6 +12,7 @@ static const u16 SCREEN_WIDTH = (u16) 64 * PIXEL_SIZE;
 
 void initGfx(Display *display);
 void Draw(chip8 *chip, Display *display);
+b8 checkForExit();
 void exitGfx(Display *display);
 
 #endif

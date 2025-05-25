@@ -5,7 +5,7 @@ typedef struct {
     b8 memory[4096];
     u16 stack[16];
 
-    // Reigsters
+    // Registers
     b8 V[16];
     u16 I, PC;
     b8 SP;
