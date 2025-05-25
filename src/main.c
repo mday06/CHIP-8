@@ -8,21 +8,28 @@
 #include "input.h"
 #include "graphics.h"
 
+// Declar instantele de emulare si afisare
 chip8 chip;
 Display display;
 
 int main() {
+    // Folosesc ca seed pentru randomizare data actuala
     srand(time(0));
+    // Procesul de initializare a consolei
     initialize(&chip);
 
     // char ROMname[] = "IBM Logo";
     // char ROMname[] = "Pong [Paul Vervalin, 1990]";
     // char ROMname[] = "test_opcode";
-     char ROMname[] = "Keypad Test [Hap, 2006]";
+    char ROMname[] = "Keypad Test [Hap, 2006]";
+
+    // Incarc ROMul
     loadROM(&chip, ROMname);
 
+    // Initializez display-ul
     initGfx(&display);
 
+    // semaforul de inchidere
     b8 close_requested = 0;
     b8 decrementCounter = 0;
     while(!close_requested) {

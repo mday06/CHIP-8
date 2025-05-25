@@ -1,6 +1,7 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
+// Structura consolei
 typedef struct {
     b8 memory[4096];
     u16 stack[16];
@@ -16,20 +17,20 @@ typedef struct {
     b8 keyboard[16];
 } chip8;
 
-// Framebuffer related
+// Framebuffer related || Pentru framebuffer
 static const b8 FRAMEBUFFER_WIDTH = 64;
 static const b8 FRAMEBUFFER_HEIGHT = 32;
 static const u16 FRAMEBUFFER_SIZE = 64 * 32;
 
-// Rom related
+// ROM related || Pentru ROM
 static const u16 MAX_ROM_SIZE = 4096;
 static const u16 ROM_LOAD_ADDRESS = 0x200;
 
-// Frequency related
+// Frequency related || Pentru frecventa
 static const u16 INSTRUCTIONS_PER_SECOND = 600;
 static const float TIME_PER_FRAME = 1000.0f/(float)INSTRUCTIONS_PER_SECOND;
 
-// Font related
+// Font related || Pentru font
 static const b8 FONT_SIZE = 80;
 static const b8 FONT_START_ADDRESS = 0x50;
 static const b8 font[16 * 5] = {
@@ -67,7 +68,7 @@ static const b8 font[16 * 5] = {
     0xf0, 0x80, 0xf0, 0x80, 0x80,
 };
 
-// Opcode masks
+// Opcode masks || Mastile instructiunilor
 static const u16 firstNibbleMask = 0xF000;
 static const u16 xMask = 0xF00;
 static const u16 yMask = 0xF0;

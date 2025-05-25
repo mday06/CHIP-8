@@ -30,14 +30,15 @@ void loadROM(chip8 *chip, char ROMname[]) {
         return;
     }
 
-    // Seek to the end of the file
+    // Seek to the end of the file || Parcurge pointer-ul pana la sfarsitul fisierului
     fseek(ROMfile, 0, SEEK_END);
-    // Set fileSize to the size in bytes from
-    // the beginning to the ROMfile poiner
+    // Set fileSize to the size in bytes from || fileSize pastreaza marimea
+    // the beginning to the ROMfile poiner    || in bytes de la inceput pana
+    //                                        || la sfarsit
     long fileSize = ftell(ROMfile);
-    // Seek back to the beginning
+    // Seek back to the beginning || parcurgem inapoi
     fseek(ROMfile, 0, SEEK_SET);
-    // Checks if the filesize is too big to load it at once
+    // Checks if the filesize is too big to load it at once || verificam daca fileSize e prea mare
     // Note: Maybe create an alternative way of loading it if
     // it is too large.
     if(fileSize > MAX_ROM_SIZE - ROM_LOAD_ADDRESS + 1) {
@@ -46,13 +47,14 @@ void loadROM(chip8 *chip, char ROMname[]) {
         return;
     }
 
-    // Load the rom in the chip's memory
+    // Load the rom in the chip's memory || incarcam ROM-ul in memoria consolei
     fread(chip->memory + ROM_LOAD_ADDRESS, 1, fileSize, ROMfile);
     fclose(ROMfile);
 }
 
 u16 fetchInstruction(chip8 *chip) {
     u16 opcode = 0;
+    // selectam opcode-ul din seria de bytes din fisier
     opcode = (((opcode | chip->memory[chip->PC]) << 8) | chip->memory[chip->PC + 1]);
     // Move PC to the next set of instruction in memory
     chip->PC += 2;
@@ -61,56 +63,56 @@ u16 fetchInstruction(chip8 *chip) {
 
 b8 executeInstruction(chip8 *chip, u16 opcode) {
     // Note: Make the function return 2 if it's waiting
-    // for input
+    // for input ---> Not necessary anymore
     // This function also returns 1 if the framebuffer
     // changed or 0 if it didn't change
     b8 drawFlag = 0;
     switch(opcode & firstNibbleMask) {
         case 0x0000:
             switch(opcode & nnMask) {
-                // Clear screen
+                // Clear screen || Sterge ecranul
                 case 0xE0:
                     memset(chip->framebuffer, 0, sizeof(chip->framebuffer));
                     drawFlag = 1;
                     break;
-                // Pop address from the stack
+                // Pop address from the stack || Scoatem adresa din stiva
                 case 0xEE:
                     chip->SP--;
                     chip->PC = chip->stack[chip->SP];
                     break;
             }
             break;
-        // Set the Program Counter to the nnn address
+        // Set the Program Counter to the nnn address || PC devine nnn
         case 0x1000:
             chip->PC = opcode & nnnMask;
             break;
-        // Push address to the stack
+        // Push address to the stack || Adaugam adresa in stiva
         case 0x2000:
             chip->stack[chip->SP] = chip->PC;
             chip->SP++;
             chip->PC = opcode & nnnMask;
             break;
-        // Skip one instruction if Vx == nn
+        // Skip one instruction if Vx == nn || Sarim peste o instructiune daca Vx == nn
         case 0x3000:
             if(chip->V[(opcode & xMask) >> 8] == (opcode & nnMask))
                 chip->PC += 2;
             break;
-        // Skip one instruction if Vx != nn
+        // Skip one instruction if Vx != nn || Sarim daca Vx != nn
         case 0x4000:
             if(chip->V[(opcode & xMask) >> 8] != (opcode & nnMask))
                 chip->PC += 2;
             break;
-        // Skip if Vx == Vy
+        // Skip if Vx == Vy || Sarim daca Vx == Vy
         case 0x5000:
             if(chip->V[(opcode & xMask) >> 8] == chip->V[(opcode & yMask) >> 4])
                 chip->PC += 2;
             break;
-        // Set the Vx register to nn
+        // Set the Vx register to nn || Vx devine nn
             break;
         case 0x6000:
             chip->V[(opcode & xMask) >> 8] = opcode & nnMask;
             break;
-        // Addition to the Vx register
+        // Addition to the Vx register || Adaugare la Vx
         case 0x7000:
             chip->V[(opcode & xMask) >> 8] += opcode & nnMask;
             break;
@@ -147,7 +149,7 @@ b8 executeInstruction(chip8 *chip, u16 opcode) {
                         chip->V[0xF] = 1;
                     chip->V[(opcode & xMask) >> 8] -= chip->V[(opcode & yMask) >> 4];
                     break;
-                // Set Vx to Vy, Shift Vx one bit to the right, Set VF to the value that the shifted bit stored
+                // Set Vx to Vy, Shift Vx one bit to the right, Set VF to the value that the shifted bit stored || Vx = Vy, mutam Vx cu un bit la dreapta, VF devine valoarea pe care bit-ul mutat o stoca
                 case 0x6: {
                     b8 x = (opcode & xMask) >> 8;
                     chip->V[x] = chip->V[(opcode & yMask) >> 4];
